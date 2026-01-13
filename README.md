@@ -246,7 +246,53 @@ unless is_valid { return; }
 | `?.` | Safe Navigation (`ptr?.field`) | - |
 | `?` | Try Operator (`res?` returns error if present) | - |
 
-### 7. Memory Management
+### 7. Printing and String Interpolation
+
+Zen C provides versatile options for printing to the console, including keywords and concise shorthands.
+
+#### Keywords
+
+- `print "text"`: Prints to `stdout` without a trailing newline.
+- `println "text"`: Prints to `stdout` with a trailing newline.
+- `eprint "text"`: Prints to `stderr` without a trailing newline.
+- `eprintln "text"`: Prints to `stderr` with a trailing newline.
+
+#### Shorthands
+
+Zen C allows you to use string literals directly as statements for quick printing:
+
+- `"Hello World"`: Equivalent to `println "Hello World"`. (Implicitly adds newline)
+- `"Hello World"..`: Equivalent to `print "Hello World"`. (No trailing newline)
+- `!"Error"`: Equivalent to `eprintln "Error"`. (Output to stderr)
+- `!"Error"..`: Equivalent to `eprint "Error"`. (Output to stderr, no newline)
+
+#### String Interpolation (F-strings)
+
+You can embed expressions directly into string literals using `{}` syntax. This works with all printing methods and string shorthands.
+
+```c
+int x = 42;
+char *name = "Zen";
+println "Value: {x}, Name: {name}";
+"Value: {x}, Name: {name}"; // shorthand println
+```
+
+#### Input Prompts (`?`)
+
+Zen C supports a shorthand for prompting user input using the `?` prefix.
+
+- `? "Prompt text"`: Prints the prompt (without newline) and waits for input (reads a line).
+- `? "Enter age: " (age)`: Prints prompt and scans input into the variable `age`.
+    - Supports `int`, `float`, `char`, `string` types.
+    - Format specifiers are automatically inferred based on variable type.
+
+```c
+int age;
+? "How old are you? " (age);
+println "You are {age} years old.";
+```
+
+### 8. Memory Management
 
 Zen C allows manual memory management with ergonomic aids.
 
@@ -273,7 +319,7 @@ impl Drop for MyStruct {
 }
 ```
 
-### 8. Object Oriented Programming
+### 9. Object Oriented Programming
 
 #### Methods
 Define methods on types using `impl`.
@@ -313,7 +359,7 @@ struct Player {
 }
 ```
 
-### 9. Generics
+### 10. Generics
 
 Type-safe templates for Structs and Functions.
 
@@ -329,7 +375,7 @@ fn identity<T>(val: T) -> T {
 }
 ```
 
-### 10. Concurrency (Async/Await)
+### 11. Concurrency (Async/Await)
 
 Built on pthreads.
 
@@ -345,7 +391,7 @@ fn main() {
 }
 ```
 
-### 11. Metaprogramming
+### 12. Metaprogramming
 
 #### Comptime
 Run code at compile-time to generate source or print messages.
@@ -374,7 +420,7 @@ Pass preprocessor macros through to C.
 #define MAX_BUFFER 1024
 ```
 
-### 12. Attributes
+### 13. Attributes
 
 Decorate functions and structs to modify compiler behavior.
 
@@ -394,7 +440,7 @@ Decorate functions and structs to modify compiler behavior.
 | `@noreturn` | Fn | Function does not return (e.g. exit). |
 | `@derived(...)` | Struct | Auto-implement traits (e.g. `Debug`). |
 
-### 13. Inline Assembly
+### 14. Inline Assembly
 
 Zen C provides first-class support for inline assembly, transpiling directly to GCC-style extended `asm`.
 
@@ -443,7 +489,7 @@ fn add(a: int, b: int) -> int {
 
 > **Note:** When using Intel syntax (via `-masm=intel`), you must ensure your build is configured correctly (for example, `//> cflags: -masm=intel`). TCC does not support Intel syntax assembly.
 
-### 14. Build Directives
+### 15. Build Directives
 
 Zen C supports special comments at the top of your source file to configure the build process without needing a complex build system or Makefile.
 
