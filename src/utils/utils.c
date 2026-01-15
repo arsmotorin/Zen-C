@@ -107,6 +107,7 @@ void zwarn(const char *fmt, ...)
     {
         return;
     }
+    g_warning_count++;
     va_list a;
     va_start(a, fmt);
     fprintf(stderr, COLOR_YELLOW "warning: " COLOR_RESET COLOR_BOLD);
@@ -122,6 +123,7 @@ void zwarn_at(Token t, const char *fmt, ...)
         return;
     }
     // Header: 'warning: message'.
+    g_warning_count++;
     va_list a;
     va_start(a, fmt);
     fprintf(stderr, COLOR_YELLOW "warning: " COLOR_RESET COLOR_BOLD);
@@ -528,6 +530,7 @@ char *load_file(const char *fn)
 // ** Build Directives **
 char g_link_flags[MAX_FLAGS_SIZE] = "";
 char g_cflags[MAX_FLAGS_SIZE] = "";
+int g_warning_count = 0;
 CompilerConfig g_config = {0};
 
 void scan_build_directives(ParserContext *ctx, const char *src)

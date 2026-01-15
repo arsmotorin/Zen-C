@@ -3725,6 +3725,14 @@ ASTNode *parse_import(ParserContext *ctx, Lexer *l)
         }
     }
 
+    // Canonicalize path to avoid duplicates (for example: "./std/io.zc" vs "std/io.zc")
+    char *real_fn = realpath(fn, NULL);
+    if (real_fn)
+    {
+        free(fn);
+        fn = real_fn;
+    }
+
     // Check if file already imported
     if (is_file_imported(ctx, fn))
     {

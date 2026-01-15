@@ -128,6 +128,7 @@ char *load_file(const char *filename);
 // ** Build Directives **
 extern char g_link_flags[MAX_FLAGS_SIZE];
 extern char g_cflags[MAX_FLAGS_SIZE];
+extern int g_warning_count;
 
 struct ParserContext;
 
