@@ -684,9 +684,9 @@ fn main() {
 
 > **Note:** The `--cpp` flag switches the backend to `g++` and emits C++-compatible code (uses `auto` instead of `__auto_type`, function overloads instead of `_Generic`, and explicit casts for `void*`).
 
-### CUDA Interop
+#### CUDA Interop
 
-Zen C can generate CUDA-compatible code with the `--cuda` flag, allowing you to write GPU kernels using Zen C syntax.
+Zen C supports GPU programming by transpiling to **CUDA C++**. This allows you to leverage powerful C++ features (templates, constexpr) within your kernels while maintaining Zen C's ergonomic syntax.
 
 ```bash
 # Direct compilation with nvcc
@@ -725,12 +725,10 @@ This transpiles to: `kernel_name<<<grid, block, shared, stream>>>(args);`
 Use Zen C function syntax with `@global` and the `launch` statement:
 
 ```zc
-include <cuda_runtime.h>
 import "std/cuda.zc"
 
 @global
 fn add_kernel(a: float*, b: float*, c: float*, n: int) {
-    // You can use raw CUDA C or the std/cuda.zc helpers
     var i = thread_id();
     if i < n {
         c[i] = a[i] + b[i];
@@ -738,12 +736,22 @@ fn add_kernel(a: float*, b: float*, c: float*, n: int) {
 }
 
 fn main() {
-    // ... allocation ...
+    const N = 1024;
+    var d_a = cuda_alloc<float>(N);
+    var d_b = cuda_alloc<float>(N); 
+    var d_c = cuda_alloc<float>(N);
+    defer cuda_free(d_a);
+    defer cuda_free(d_b);
+    defer cuda_free(d_c);
+
+    // ... init data ...
+    
     launch add_kernel(d_a, d_b, d_c, N) with {
-        grid: num_blocks,
+        grid: (N + 255) / 256,
         block: 256
     };
-    // ... cleanup ...
+    
+    cuda_sync();
 }
 ```
 
