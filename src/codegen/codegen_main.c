@@ -577,13 +577,9 @@ void codegen_node(ParserContext *ctx, ASTNode *node, FILE *out)
                 }
                 else
                 {
-                    char *lt = strchr(sname, '<');
-                    if (lt)
+                    char *buf = strip_template_suffix(sname);
+                    if (buf)
                     {
-                        int len = lt - sname;
-                        char *buf = xmalloc(len + 1);
-                        strncpy(buf, sname, len);
-                        buf[len] = 0;
                         def = find_struct_def_codegen(ctx, buf);
                         if (def && def->strct.is_template)
                         {
@@ -623,13 +619,9 @@ void codegen_node(ParserContext *ctx, ASTNode *node, FILE *out)
                 }
                 else
                 {
-                    char *lt = strchr(sname, '<');
-                    if (lt)
+                    char *buf = strip_template_suffix(sname);
+                    if (buf)
                     {
-                        int len = lt - sname;
-                        char *buf = xmalloc(len + 1);
-                        strncpy(buf, sname, len);
-                        buf[len] = 0;
                         def = find_struct_def_codegen(ctx, buf);
                         if (def && def->strct.is_template)
                         {

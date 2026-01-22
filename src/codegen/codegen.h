@@ -12,6 +12,7 @@ void codegen_node(ParserContext *ctx, ASTNode *node, FILE *out);
 void codegen_node_single(ParserContext *ctx, ASTNode *node, FILE *out);
 void codegen_walker(ParserContext *ctx, ASTNode *node, FILE *out);
 void codegen_expression(ParserContext *ctx, ASTNode *node, FILE *out);
+void codegen_match_internal(ParserContext *ctx, ASTNode *node, FILE *out, int use_result);
 
 // Utility functions (codegen_utils.c).
 char *infer_type(ParserContext *ctx, ASTNode *node);
@@ -24,6 +25,7 @@ const char *parse_original_method_name(const char *mangled);
 void emit_auto_type(ParserContext *ctx, ASTNode *init_expr, Token t, FILE *out);
 char *codegen_type_to_string(Type *t);
 void emit_func_signature(FILE *out, ASTNode *func, const char *name_override);
+char *strip_template_suffix(const char *name);
 
 // Declaration emission  (codegen_decl.c).
 void emit_preamble(ParserContext *ctx, FILE *out);
@@ -47,6 +49,7 @@ extern int tmp_counter;
 extern int defer_count;
 extern ASTNode *defer_stack[];
 extern ASTNode *g_current_lambda;
+extern char *g_current_func_ret_type;
 
 // Defer boundary tracking for proper defer execution on break/continue/return
 #define MAX_DEFER 1024

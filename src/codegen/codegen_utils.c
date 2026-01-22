@@ -20,6 +20,26 @@ int loop_defer_boundary[MAX_LOOP_DEPTH];
 int loop_depth = 0;
 int func_defer_boundary = 0;
 
+// Strip template suffix from a type name (for example, "MyStruct<T>" -> "MyStruct")
+// Returns newly allocated string, caller must free.
+char *strip_template_suffix(const char *name)
+{
+    if (!name)
+    {
+        return NULL;
+    }
+    char *lt = strchr(name, '<');
+    if (lt)
+    {
+        int len = lt - name;
+        char *buf = xmalloc(len + 1);
+        strncpy(buf, name, len);
+        buf[len] = 0;
+        return buf;
+    }
+    return xstrdup(name);
+}
+
 // Helper to emit variable declarations with array types.
 void emit_var_decl_type(ParserContext *ctx, FILE *out, const char *type_str, const char *var_name)
 {
