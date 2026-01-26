@@ -689,19 +689,25 @@ static ASTNode *generate_derive_impls(ParserContext *ctx, ASTNode *strct, char *
                     }
                     else if (strcmp(ft, "double") == 0)
                     {
-                        sprintf(assign, "let _f_%s = (*j).get_float(\"%s\").unwrap_or(0.0);\n", fn, fn);
+                        sprintf(assign, "let _f_%s = (*j).get_float(\"%s\").unwrap_or(0.0);\n", fn,
+                                fn);
                     }
                     else if (strcmp(ft, "bool") == 0)
                     {
-                        sprintf(assign, "let _f_%s = (*j).get_bool(\"%s\").unwrap_or(false);\n", fn, fn);
+                        sprintf(assign, "let _f_%s = (*j).get_bool(\"%s\").unwrap_or(false);\n", fn,
+                                fn);
                     }
                     else if (strcmp(ft, "char*") == 0)
                     {
-                        sprintf(assign, "let _f_%s = (*j).get_string(\"%s\").unwrap_or(\"\");\n", fn, fn);
+                        sprintf(assign, "let _f_%s = (*j).get_string(\"%s\").unwrap_or(\"\");\n",
+                                fn, fn);
                     }
                     else if (strcmp(ft, "String") == 0)
                     {
-                        sprintf(assign, "let _f_%s = String::new((*j).get_string(\"%s\").unwrap_or(\"\"));\n", fn, fn);
+                        sprintf(
+                            assign,
+                            "let _f_%s = String::new((*j).get_string(\"%s\").unwrap_or(\"\"));\n",
+                            fn, fn);
                     }
                     else if (ft && strstr(ft, "Vec") && strstr(ft, "String"))
                     {
@@ -710,7 +716,8 @@ static ASTNode *generate_derive_impls(ParserContext *ctx, ASTNode *strct, char *
                         {
                             vec_fields[vec_field_count++] = fn;
                         }
-                        sprintf(assign,
+                        sprintf(
+                            assign,
                             "let _f_%s = Vec<String>::new();\n"
                             "let _arr_%s = (*j).get_array(\"%s\");\n"
                             "if _arr_%s.is_some() {\n"
@@ -726,16 +733,18 @@ static ASTNode *generate_derive_impls(ParserContext *ctx, ASTNode *strct, char *
                             "    }\n"
                             "  }\n"
                             "}\n",
-                            fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn);
+                            fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn,
+                            fn, fn, fn, fn, fn);
                     }
                     else
                     {
                         // Nested struct: call NestedType::from_json recursively
                         sprintf(assign,
-                            "let _opt_%s = (*j).get(\"%s\");\n"
-                            "let _f_%s: %s;\n"
-                            "if _opt_%s.is_some() { _f_%s = %s::from_json(_opt_%s.unwrap()).unwrap(); }\n",
-                            fn, fn, fn, ft, fn, fn, ft, fn);
+                                "let _opt_%s = (*j).get(\"%s\");\n"
+                                "let _f_%s: %s;\n"
+                                "if _opt_%s.is_some() { _f_%s = "
+                                "%s::from_json(_opt_%s.unwrap()).unwrap(); }\n",
+                                fn, fn, fn, ft, fn, fn, ft, fn);
                     }
                     strcat(body, assign);
                 }
@@ -755,7 +764,10 @@ static ASTNode *generate_derive_impls(ParserContext *ctx, ASTNode *strct, char *
             {
                 if (f->type == NODE_FIELD)
                 {
-                    if (!first) strcat(body, ", ");
+                    if (!first)
+                    {
+                        strcat(body, ", ");
+                    }
                     char init[128];
                     // Check if this is a Vec<String> field - clone it to avoid double-free
                     int is_vec_field = 0;
@@ -783,9 +795,8 @@ static ASTNode *generate_derive_impls(ParserContext *ctx, ASTNode *strct, char *
             strcat(body, " }); ");
 
             code = xmalloc(8192 + 1024);
-            sprintf(code,
-                "impl %s { fn from_json(j: JsonValue*) -> Result<%s> { %s } }",
-                name, name, body);
+            sprintf(code, "impl %s { fn from_json(j: JsonValue*) -> Result<%s> { %s } }", name,
+                    name, body);
         }
         else if (0 == strcmp(trait, "ToJson"))
         {
@@ -817,11 +828,13 @@ static ASTNode *generate_derive_impls(ParserContext *ctx, ASTNode *strct, char *
 
                     if (strcmp(ft, "int") == 0)
                     {
-                        sprintf(set_call, "_obj.set(\"%s\", JsonValue::number((double)self.%s));\n", fn, fn);
+                        sprintf(set_call, "_obj.set(\"%s\", JsonValue::number((double)self.%s));\n",
+                                fn, fn);
                     }
                     else if (strcmp(ft, "double") == 0)
                     {
-                        sprintf(set_call, "_obj.set(\"%s\", JsonValue::number(self.%s));\n", fn, fn);
+                        sprintf(set_call, "_obj.set(\"%s\", JsonValue::number(self.%s));\n", fn,
+                                fn);
                     }
                     else if (strcmp(ft, "bool") == 0)
                     {
@@ -829,28 +842,29 @@ static ASTNode *generate_derive_impls(ParserContext *ctx, ASTNode *strct, char *
                     }
                     else if (strcmp(ft, "char*") == 0)
                     {
-                        sprintf(set_call, "_obj.set(\"%s\", JsonValue::string(self.%s));\n", fn, fn);
+                        sprintf(set_call, "_obj.set(\"%s\", JsonValue::string(self.%s));\n", fn,
+                                fn);
                     }
                     else if (strcmp(ft, "String") == 0)
                     {
-                        sprintf(set_call, "_obj.set(\"%s\", JsonValue::string(self.%s.c_str()));\n", fn, fn);
+                        sprintf(set_call, "_obj.set(\"%s\", JsonValue::string(self.%s.c_str()));\n",
+                                fn, fn);
                     }
                     else if (ft && strstr(ft, "Vec") && strstr(ft, "String"))
                     {
                         sprintf(set_call,
-                            "let _arr_%s = JsonValue::array();\n"
-                            "for let _i_%s: usize = 0; _i_%s < self.%s.length(); _i_%s = _i_%s + 1 {\n"
-                            "  _arr_%s.push(JsonValue::string(self.%s.get(_i_%s).c_str()));\n"
-                            "}\n"
-                            "_obj.set(\"%s\", _arr_%s);\n",
-                            fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn);
+                                "let _arr_%s = JsonValue::array();\n"
+                                "for let _i_%s: usize = 0; _i_%s < self.%s.length(); _i_%s = _i_%s "
+                                "+ 1 {\n"
+                                "  _arr_%s.push(JsonValue::string(self.%s.get(_i_%s).c_str()));\n"
+                                "}\n"
+                                "_obj.set(\"%s\", _arr_%s);\n",
+                                fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn);
                     }
                     else
                     {
                         // Nested struct: call to_json recursively
-                        sprintf(set_call,
-                            "_obj.set(\"%s\", self.%s.to_json());\n",
-                            fn, fn);
+                        sprintf(set_call, "_obj.set(\"%s\", self.%s.to_json());\n", fn, fn);
                     }
                     strcat(body, set_call);
                 }
@@ -860,9 +874,7 @@ static ASTNode *generate_derive_impls(ParserContext *ctx, ASTNode *strct, char *
             strcat(body, "return _obj;");
 
             code = xmalloc(8192 + 1024);
-            sprintf(code,
-                "impl %s { fn to_json(self) -> JsonValue { %s } }",
-                name, body);
+            sprintf(code, "impl %s { fn to_json(self) -> JsonValue { %s } }", name, body);
         }
 
         if (code)

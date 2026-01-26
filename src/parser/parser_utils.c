@@ -858,6 +858,7 @@ ASTNode *copy_fields(ASTNode *fields)
     n->next = copy_fields(fields->next);
     return n;
 }
+
 char *replace_in_string(const char *src, const char *old_w, const char *new_w)
 {
     if (!src || !old_w || !new_w)
@@ -921,20 +922,23 @@ char *replace_in_string(const char *src, const char *old_w, const char *new_w)
     int newWlen = strlen(new_w);
     int oldWlen = strlen(old_w);
 
+    // Pass 1: Count replacements
+    int in_string = 0;
     for (i = 0; src[i] != '\0'; i++)
     {
-        if (strstr(&src[i], old_w) == &src[i])
+        if (src[i] == '"' && (i == 0 || src[i - 1] != '\\'))
         {
-            // Check boundaries to ensure we match whole words only
-            int valid = 1;
+            in_string = !in_string;
+        }
 
-            // Check preceding character
+        if (!in_string && strstr(&src[i], old_w) == &src[i])
+        {
+            // Check boundaries
+            int valid = 1;
             if (i > 0 && is_ident_char(src[i - 1]))
             {
                 valid = 0;
             }
-
-            // Check following character
             if (valid && is_ident_char(src[i + oldWlen]))
             {
                 valid = 0;
@@ -951,42 +955,47 @@ char *replace_in_string(const char *src, const char *old_w, const char *new_w)
     // Allocate result buffer
     result = (char *)xmalloc(i + cnt * (newWlen - oldWlen) + 1);
 
-    i = 0;
-    while (*src)
+    // Pass 2: Perform replacement
+    int j = 0;
+    in_string = 0;
+
+    int src_idx = 0;
+
+    while (src[src_idx] != '\0')
     {
-        if (strstr(src, old_w) == src)
+        if (src[src_idx] == '"' && (src_idx == 0 || src[src_idx - 1] != '\\'))
+        {
+            in_string = !in_string;
+        }
+
+        int replaced = 0;
+        if (!in_string && strstr(&src[src_idx], old_w) == &src[src_idx])
         {
             int valid = 1;
-
-            // Check boundary relative to the *new* result buffer built so far
-            if (i > 0 && is_ident_char(result[i - 1]))
+            if (src_idx > 0 && is_ident_char(src[src_idx - 1]))
             {
                 valid = 0;
             }
-
-            // Check boundary relative to the *original* source string
-            if (valid && is_ident_char(src[oldWlen]))
+            if (valid && is_ident_char(src[src_idx + oldWlen]))
             {
                 valid = 0;
             }
 
             if (valid)
             {
-                strcpy(&result[i], new_w);
-                i += newWlen;
-                src += oldWlen;
-            }
-            else
-            {
-                result[i++] = *src++;
+                strcpy(&result[j], new_w);
+                j += newWlen;
+                src_idx += oldWlen;
+                replaced = 1;
             }
         }
-        else
+
+        if (!replaced)
         {
-            result[i++] = *src++;
+            result[j++] = src[src_idx++];
         }
     }
-    result[i] = '\0';
+    result[j] = '\0';
     return result;
 }
 
