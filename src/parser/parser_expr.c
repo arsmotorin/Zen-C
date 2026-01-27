@@ -2685,7 +2685,9 @@ ASTNode *parse_primary(ParserContext *ctx, Lexer *l)
                 else
                 {
                     node->resolved_type = xstrdup("unknown");
-                    if (should_suppress_undef_warning(ctx, acc))
+                    // If the symbol exists (but type is unknown) OR suppression is requested, don't
+                    // fallback to suggestion
+                    if (sym || should_suppress_undef_warning(ctx, acc))
                     {
                         node->var_ref.suggestion = NULL;
                     }
