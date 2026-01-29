@@ -156,6 +156,14 @@ int is_type_copy(ParserContext *ctx, Type *t)
         {
             return 1;
         }
+
+        // If the struct is NOT defined (opaque/C type) and does NOT implement Drop,
+        // treat it as Copy (C behavior).
+        if (!find_struct_def(ctx, t->name) && !check_impl(ctx, "Drop", t->name))
+        {
+            return 1;
+        }
+
         return 0;
 
     case TYPE_ARRAY:
@@ -163,6 +171,13 @@ int is_type_copy(ParserContext *ctx, Type *t)
         // For Zen-C safety, let's treat them as Copy if they are treated as pointers,
         // but if it's a value assignment, C doesn't support it anyway unless wrapped in struct.
         return 0;
+
+    case TYPE_ALIAS:
+        if (t->alias.is_opaque_alias)
+        {
+            return 1;
+        }
+        return is_type_copy(ctx, t->inner);
 
     default:
         return 1;
