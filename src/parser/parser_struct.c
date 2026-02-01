@@ -863,7 +863,7 @@ ASTNode *parse_struct(ParserContext *ctx, Lexer *l, int is_union, int is_opaque)
                 Token field_name = lexer_next(l);
                 lexer_next(l); // eat :
                 Type *ft = parse_type_formal(ctx, l);
-                char *field_type_str = type_to_string(ft);
+                char *field_type_str = type_to_c_string(ft);
                 expect(l, TOK_SEMICOLON, "Expected ;");
 
                 ASTNode *nf = ast_create(NODE_FIELD);
@@ -947,7 +947,7 @@ ASTNode *parse_struct(ParserContext *ctx, Lexer *l, int is_union, int is_opaque)
             Token f_name = lexer_next(l);
             expect(l, TOK_COLON, "Expected :");
             Type *ft = parse_type_formal(ctx, l);
-            char *f_type = type_to_string(ft);
+            char *f_type = type_to_c_string(ft);
 
             ASTNode *f = ast_create(NODE_FIELD);
             f->field.name = token_strdup(f_name);
@@ -1120,7 +1120,7 @@ ASTNode *parse_enum(ParserContext *ctx, Lexer *l)
                     while (lexer_peek(l).type == TOK_COMMA)
                     {
                         lexer_next(l); // eat ,
-                        strcat(sig, "_");
+                        strcat(sig, "__");
                         Type *next_t = parse_type_obj(ctx, l);
                         char *ns = type_to_string(next_t);
                         if (strlen(sig) + strlen(ns) + 2 > 510)

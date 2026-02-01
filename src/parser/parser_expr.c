@@ -1908,7 +1908,7 @@ ASTNode *parse_primary(ParserContext *ctx, Lexer *l)
                     {
                         Type *formal_type = parse_type_formal(ctx, l);
                         concrete_types[arg_count] = type_to_string(formal_type);
-                        unmangled_types[arg_count] = type_to_c_string(formal_type);
+                        unmangled_types[arg_count] = type_to_string(formal_type);
                         arg_count++;
 
                         if (lexer_peek(l).type == TOK_COMMA)
@@ -2944,7 +2944,7 @@ ASTNode *parse_primary(ParserContext *ctx, Lexer *l)
             {
                 if (i > 0)
                 {
-                    strcat(sig, "_");
+                    strcat(sig, "__");
                 }
                 strcat(sig, type_strs[i]);
             }
